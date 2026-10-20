@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo de Produtos | AgroFeira Paragominas</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <a class="logo" href="index.html">🌿 <span>AgroFeira</span></a>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="catalogo.html" style="color:var(--amarelo)">Produtos</a>
+      <a href="sobre.html">Produtores & Sobre</a>
+      <a href="safra.html">Feira & Safra</a>
+      <a href="cadastro-produtor.html" class="btn btn-primary">Sou produtor</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section id="catalogo" style="padding-top:40px;">
+    <div class="container">
+      <div class="section-head">
+        <h2>🧺 Catálogo de Produtos</h2>
+        <p>Pesquise digitando, usando sua voz ou filtrando por categoria.</p>
+      </div>
+      <div class="toolbar">
+        <div class="search">
+          <span>🔎</span>
+          <input id="search" type="search" placeholder="Buscar produto ou produtor..." oninput="renderProducts()">
+          <button class="voice-search-btn" id="voiceBtn" onclick="toggleVoiceSearch()" title="Pesquisar por voz">🎤 Falar</button>
+        </div>
+        <select id="sort" class="select" onchange="renderProducts()">
+          <option value="default">Ordenar: padrão</option>
+          <option value="low">Menor preço</option>
+          <option value="high">Maior preço</option>
+          <option value="name">Nome A–Z</option>
+        </select>
+      </div>
+      <div class="chips" id="chips">
+        <button class="chip active" data-cat="Todos">Todos</button>
+        <button class="chip" data-cat="Hortaliças">🥬 Hortaliças</button>
+        <button class="chip" data-cat="Frutas">🍌 Frutas</button>
+        <button class="chip" data-cat="Raízes">🥔 Raízes</button>
+        <button class="chip" data-cat="Mel">🍯 Mel</button>
+        <button class="chip" data-cat="Laticínios">🧀 Laticínios</button>
+        <button class="chip" data-cat="Artesanato">🧺 Artesanato</button>
+        <button class="chip" data-cat="Insumos">🌱 Insumos</button>
+      </div>
+      <div id="productGrid" class="grid"></div>
+      <div id="empty" class="empty">🔎 Nenhum produto encontrado. Tente outro termo ou categoria.</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container copyright">© 2026 AgroFeira Paragominas</div>
+</footer>
+
+<button class="cart-btn" onclick="openCart()" aria-label="Abrir carrinho">🛒<span id="cartCount" class="cart-count">0</span></button>
+<div id="toast" class="toast">Item adicionado à cesta!</div>
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-head"><h2 id="modalTitle">Cesta de compras</h2><button class="close" onclick="closeModal()">✕</button></div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const products = [
+ {id:1, name:"Mandioca Amarela", cat:"Raízes", producer:"João da Silva", place:"Barraca 12", price:5, unit:"kg", img:"https://images.unsplash.com/photo-1596485804153-6258622c7a72?auto=format&fit=crop&w=700&q=85", desc:"Macia e fresca, colhida de madrugada."},
+ {id:2, name:"Mel Silvestre", cat:"Mel", producer:"Apiário do Sol", place:"Barraca 05", price:25, unit:"unidade", img:"https://images.unsplash.com/photo-1587049352847-81a56d773c1c?auto=format&fit=crop&w=700&q=85", desc:"Mel puro e sem conservantes."},
+ {id:3, name:"Alface Crespa", cat:"Hortaliças", producer:"João da Silva", place:"Barraca 12", price:3.5, unit:"maço", img:"https://images.unsplash.com/photo-1622205313162-be1d5712a43d?auto=format&fit=crop&w=700&q=85", desc:"Folhas frescas para saladas."},
+ {id:4, name:"Banana Prata", cat:"Frutas", producer:"Sítio Boa Esperança", place:"Barraca 08", price:6, unit:"kg", img:"https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=700&q=85", desc:"Banana selecionada e madura no ponto."},
+ {id:5, name:"Queijo Artesanal", cat:"Laticínios", producer:"Sabor da Roça", place:"Barraca 16", price:32, unit:"peça", img:"https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=700&q=85", desc:"Produção artesanal em pequena escala."},
+ {id:6, name:"Cesta de Hortaliças", cat:"Hortaliças", producer:"Horta Jaderlândia", place:"Barraca 10", price:30, unit:"cesta", img:"https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=700&q=85", desc:"Seleção variada de hortaliças da estação."},
+ {id:7, name:"Artesanato em Fibra", cat:"Artesanato", producer:"Artes da Terra", place:"Barraca 21", price:45, unit:"unidade", img:"https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=700&q=85", desc:"Peça artesanal produzida à mão."},
+ {id:8, name:"Polpa de Cupuaçu", cat:"Frutas", producer:"Sabores do Pará", place:"Barraca 18", price:12, unit:"500 g", img:"https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&w=700&q=85", desc:"Polpa congelada para sucos e receitas."},
+ {id:9, name:"Tomate", cat:"Hortaliças", producer:"Horta Verde", place:"Barraca 03", price:8, unit:"kg", img:"https://images.unsplash.com/photo-1546094096-0df4bcaaa337?auto=format&fit=crop&w=700&q=85", desc:"Tomates frescos selecionados."},
+ 
+ // Novos produtos integrados:
+ {id:10, name:"Açaí Tradicional da Região", cat:"Frutas", producer:"Sabores do Pará", place:"Barraca 18", price:15, unit:"litro", img:"acai.jpg", desc:"Açaí grosso batido na hora, fresco e nutritivo."},
+ {id:11, name:"Adubos Químicos e Nutrientes", cat:"Insumos", producer:"Apiário do Sol", place:"Barraca 05", price:35, unit:"kg", img:"Adubos químicos.jpg", desc:"Nutrientes balanceados para fortalecimento do solo."},
+ {id:12, name:"Alho Trançado Artesanal", cat:"Hortaliças", producer:"João da Silva", place:"Barraca 12", price:18, unit:"trança", img:"alho trançado.jpg", desc:"Alho selecionado e trançado manualmente."},
+ {id:13, name:"Biofertilizantes Orgânicos", cat:"Insumos", producer:"Apiário do Sol", place:"Barraca 05", price:22, unit:"litro", img:"biofertilizantes.jpg", desc:"Biofertilizante natural para agricultura orgânica."},
+ {id:14, name:"Cachaça Artesanal", cat:"Artesanato", producer:"Sabor da Roça", place:"Barraca 16", price:40, unit:"garrafa 750ml", img:"cachaça artesanal.jpg", desc:"Cachaça pura destilada em alambique artesanal."},
+ {id:15, name:"Café Moído na Hora", cat:"Artesanato", producer:"Sabor da Roça", place:"Barraca 16", price:20, unit:"pct 500g", img:"café moído na hora.jpg", desc:"Café colonial torrado e moído na hora."},
+ {id:16, name:"Cheiro-Verde Fresco", cat:"Hortaliças", producer:"Horta Jaderlândia", place:"Barraca 10", price:3, unit:"maço", img:"cheiro-verde.jpg", desc:"Coentro e cebolinha frescos colhidos no dia."},
+ {id:17, name:"Farinha de Mandioca", cat:"Raízes", producer:"João da Silva", place:"Barraca 12", price:10, unit:"kg", img:"farinha.jpg", desc:"Farinha crocante tradicional produzida localmente."},
+ {id:18, name:"Geleias de Frutas Tropicais", cat:"Mel", producer:"Sabores do Pará", place:"Barraca 18", price:16, unit:"pote 230g", img:"geleias de frutas tropicais.jpg", desc:"Geleias artesanais de frutas tropicais."},
+ {id:19, name:"Jambu Fresco", cat:"Hortaliças", producer:"Horta Jaderlândia", place:"Barraca 10", price:4, unit:"maço", img:"jambu.jpg", desc:"Jambu típico para tacacá e pratos regionais."},
+ {id:20, name:"Pimentas Frescas", cat:"Hortaliças", producer:"Horta Verde", place:"Barraca 03", price:7, unit:"bandeja", img:"pimenta.jpg", desc:"Pimentas selecionadas para temperos."},
+ {id:21, name:"Pimentas em Conserva", cat:"Artesanato", producer:"Sabores do Pará", place:"Barraca 18", price:18, unit:"pote", img:"pimentas em conserva.jpg", desc:"Seleção de pimentas conservadas em azeite."}
+];
+
+let category = "Todos";
+let cart = JSON.parse(localStorage.getItem("agrofeira_cart")) || [];
+let selectedPayment = "pix";
+
+document.addEventListener("DOMContentLoaded", () => {
+ updateCartCount();
+ renderProducts();
+});
+
+function renderProducts() {
+ const q = document.getElementById("search").value.toLowerCase().trim();
+ let list = products.filter(p => (category === "Todos" || p.cat === category) && `${p.name} ${p.cat} ${p.producer}`.toLowerCase().includes(q));
+ const sort = document.getElementById("sort").value;
+ if (sort === "low") list.sort((a, b) => a.price - b.price);
+ if (sort === "high") list.sort((a, b) => b.price - a.price);
+ if (sort === "name") list.sort((a, b) => a.name.localeCompare(b.name));
+
+ document.getElementById("empty").style.display = list.length ? "none" : "block";
+ document.getElementById("productGrid").innerHTML = list.map(p => `
+ <article class="card">
+  <img class="card-img" src="${p.img}" alt="${p.name}">
+  <div class="card-body">
+   <div class="card-top"><h3>${p.name}</h3><span class="tag">${p.cat}</span></div>
+   <div class="producer">👨‍🌾 ${p.producer} • ${p.place}</div>
+   <p>${p.desc}</p>
+   <div class="price">R$ ${p.price.toFixed(2).replace(".", ",")} <small>/ ${p.unit}</small></div>
+   <div class="card-actions">
+    <button class="btn outline-green" onclick="addCart(${p.id})">➕ Cesta</button>
+    <button class="btn btn-voice" onclick="speakProduct('${p.name}', ${p.price}, '${p.producer}')">🔊 Ouvir</button>
+    <a class="btn whatsapp" target="_blank" href="https://wa.me/5591980622997?text=${encodeURIComponent("Olá! Tenho interesse em " + p.name + " (" + p.producer + "). Ainda há disponibilidade?")}">WhatsApp</a>
+   </div>
+  </div>
+ </article>`).join("");
+}
+
+document.querySelectorAll(".chip").forEach(b => b.onclick = () => {
+ document.querySelectorAll(".chip").forEach(x => x.classList.remove("active"));
+ b.classList.add("active");
+ category = b.dataset.cat;
+ renderProducts();
+});
+
+function addCart(id) {
+ const p = products.find(x => x.id === id);
+ cart.push(p);
+ localStorage.setItem("agrofeira_cart", JSON.stringify(cart));
+ updateCartCount();
+ showToast("Item adicionado à cesta!");
+}
+
+function updateCartCount() {
+ document.getElementById("cartCount").textContent = cart.length;
+}
+
+function showToast(msg) {
+ const t = document.getElementById("toast");
+ t.textContent = msg;
+ t.classList.add("show");
+ setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+function speakProduct(name, price, producer) {
+ if ('speechSynthesis' in window) {
+  window.speechSynthesis.cancel();
+  const text = `${name}, produzido por ${producer}, custa ${price} reais.`;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'pt-BR';
+  window.speechSynthesis.speak(utterance);
+ }
+}
+
+function toggleVoiceSearch() {
+ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+ if (!SpeechRecognition) return alert('Busca por voz não suportada.');
+ const recognition = new SpeechRecognition();
+ recognition.lang = 'pt-BR';
+ const btn = document.getElementById("voiceBtn");
+ recognition.onstart = () => { btn.classList.add("listening"); btn.textContent = "Ouvindo..."; };
+ recognition.onresult = (event) => { document.getElementById("search").value = event.results[0][0].transcript; renderProducts(); };
+ recognition.onend = () => { btn.classList.remove("listening"); btn.textContent = "🎤 Falar"; };
+ recognition.start();
+}
+
+function openCart() {
+ document.getElementById("modalTitle").textContent = "🛒 Cesta de compras e Pagamento";
+ const c = document.getElementById("modalContent");
+ if (!cart.length) {
+  c.innerHTML = "<p>Sua cesta está vazia.</p>";
+ } else {
+  let total = cart.reduce((acc, item) => acc + item.price, 0);
+  c.innerHTML = `
+   <div style="max-height:220px;overflow:auto;margin-bottom:15px">
+    ${cart.map((p, i) => `
+     <div class="cart-line">
+      <span><b>${p.name}</b><br><small>${p.producer} • R$ ${p.price.toFixed(2).replace(".", ",")}/${p.unit}</small></span>
+      <button onclick="removeCart(${i})">🗑️</button>
+     </div>`).join("")}
+   </div>
+   <div class="cart-total">Total: R$ ${total.toFixed(2).replace(".", ",")}</div>
+   <button class="btn whatsapp" style="width:100%" onclick="checkoutOrder()">📲 Finalizar e Enviar Pedido</button>
+  `;
+ }
+ document.getElementById("modal").classList.add("show");
+}
+
+function removeCart(i) {
+ cart.splice(i, 1);
+ localStorage.setItem("agrofeira_cart", JSON.stringify(cart));
+ updateCartCount();
+ openCart();
+}
+
+function checkoutOrder() {
+ const total = cart.reduce((acc, item) => acc + item.price, 0);
+ const text = `Olá! Gostaria de fechar meu pedido na AgroFeira:%0A` + cart.map(p => `- ${p.name} (R$ ${p.price.toFixed(2)})`).join("%0A") + `%0A*Total:* R$ ${total.toFixed(2)}`;
+ window.open("https://wa.me/5591980622997?text=" + text, "_blank");
+}
+
+function closeModal() { document.getElementById("modal").classList.remove("show"); }
+</script>
+</body>
+</html>

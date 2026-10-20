@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produtores | AgroFeira Paragominas</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <a class="logo" href="index.html">🌿 <span>AgroFeira</span></a>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="catalogo.html">Produtos</a>
+      <a href="sobre.html" style="color:var(--amarelo)">Produtores & Sobre</a>
+      <a href="safra.html">Feira & Safra</a>
+      <a href="cadastro-produtor.html" class="btn btn-primary">Sou produtor</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="producers" style="padding-top:40px;">
+    <div class="container">
+      <div class="section-head"><h2>👨‍🌾 Nossos Produtores</h2><p>Conheça quem está por trás dos produtos.</p></div>
+      <div class="grid" id="producerGrid"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container copyright">© 2026 AgroFeira Paragominas</div>
+</footer>
+
+<script>
+const producersList = [
+ {name:"João da Silva", rating:"4,9 • 120 avaliações", place:"Região do Uraim • Barraca 12", spec:"Hortaliças orgânicas e raízes.", img:"https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?auto=format&fit=crop&w=400&q=85"},
+ {name:"Apiário do Sol", rating:"4,8 • 87 avaliações", place:"Comunidade rural • Barraca 05", spec:"Mel, derivados e produtos da apicultura.", img:"https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=400&q=85"},
+ {name:"Artes da Terra", rating:"4,9 • 64 avaliações", place:"Centro • Barraca 21", spec:"Artesanato e produtos feitos à mão.", img:"https://images.unsplash.com/photo-1595475207225-428b62bda831?auto=format&fit=crop&w=400&q=85"}
+];
+
+document.addEventListener("DOMContentLoaded", () => {
+ document.getElementById("producerGrid").innerHTML = producersList.map(pr => `
+  <article class="card producer-card" style="padding:20px; display:grid; grid-template-columns:100px 1fr; gap:15px; align-items:center;">
+   <img src="${pr.img}" style="width:100px;height:100px;object-fit:cover;border-radius:50%;">
+   <div>
+    <h3>${pr.name}</h3>
+    <div class="rating">⭐ ${pr.rating}</div>
+    <p class="producer">📍 ${pr.place}</p>
+    <p><small>${pr.spec}</small></p>
+   </div>
+  </article>`).join("");
+});
+</script>
+</body>
+</html>

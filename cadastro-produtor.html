@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro de Produtor | AgroFeira Paragominas</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <a class="logo" href="index.html">🌿 <span>AgroFeira</span></a>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="catalogo.html">Produtos</a>
+      <a href="sobre.html">Produtores & Sobre</a>
+      <a href="safra.html">Feira & Safra</a>
+      <a href="cadastro-produtor.html" class="btn btn-primary" style="color:var(--terra2)">Sou produtor</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="about" style="padding:50px 0;">
+    <div class="container">
+      <div class="section-head"><h2>🌾 Quer vender na AgroFeira?</h2><p>Cadastre seus dados para participar da plataforma.</p></div>
+      <form class="form" onsubmit="sendProducer(event)" style="max-width:720px;margin:auto">
+        <input id="nomeProdutor" required placeholder="Nome do produtor ou empreendimento">
+        <input id="telefoneProdutor" required placeholder="WhatsApp (ex: 91 99999-9999)">
+        <input id="produtosProdutor" required placeholder="Quais produtos você vende?">
+        <input id="localProdutor" placeholder="Comunidade / localização ou Nº da barraca">
+        <textarea id="obsProdutor" placeholder="Conte um pouco sobre sua produção"></textarea>
+        <button class="btn btn-primary" type="submit" style="width:100%;">📲 Enviar cadastro pelo WhatsApp</button>
+        <div class="notice">O cadastro é uma solicitação. A publicação depende de validação pela organização.</div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container copyright">© 2026 AgroFeira Paragominas</div>
+</footer>
+
+<script>
+function sendProducer(e) {
+ e.preventDefault();
+ const text = `Olá! Quero solicitar cadastro na AgroFeira.%0ANome: ${document.getElementById("nomeProdutor").value}%0AWhatsApp: ${document.getElementById("telefoneProdutor").value}%0AProdutos: ${document.getElementById("produtosProdutor").value}%0ALocal: ${document.getElementById("localProdutor").value}%0AObservações: ${document.getElementById("obsProdutor").value}`;
+ window.open("https://wa.me/5591980622997?text=" + text, "_blank");
+}
+</script>
+</body>
+</html>
